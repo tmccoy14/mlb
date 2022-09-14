@@ -1,2 +1,3 @@
-# mlb
-View Major League Baseball Player information and statistics
+# MLB
+
+View Major League Baseball player information, teams player for, and statistics.
