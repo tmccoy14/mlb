@@ -1,0 +1,4 @@
+assets/
+.git*
+.dockerignore
+README.md

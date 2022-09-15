@@ -1,9 +1,9 @@
 package router
 
 import (
-	api "github.com/tmccoy14/mlb/api"
-	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	api "github.com/tmccoy14/mlb/api"
 )
 
 func New() *echo.Echo {
@@ -16,7 +16,7 @@ func New() *echo.Echo {
 	e.Use(middleware.CORS())
 
 	// Add static files and assets
-	e.File("/favicon.ico", "assets/favicon.ico")
+	e.File("/favicon.ico", "static/img/favicon.ico")
 	e.Static("/static", "static")
 
 	// Create route groups
