@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"github.com/labstack/echo/v4"
+	"net/url"
 )
 
 type Stat struct {
@@ -98,10 +99,20 @@ func Stats(c echo.Context) (err error) {
 	}
 
 	// Format the URL with the player name provided
-	url := fmt.Sprintf("http://lookup-service-prod.mlb.com/json/named.search_player_all.bam?sport_code='mlb'&active_sw='Y'&name_part='%s%s'", playerName, "%25")
+	base, err := url.Parse("http://lookup-service-prod.mlb.com/json/named.search_player_all.bam")
+	if err != nil {
+		return
+	}
+
+	// Query params
+	params := url.Values{}
+	params.Add("sport_code", "'mlb'")
+	params.Add("active_sw", "'Y'")
+	params.Add("name_part", "'" + playerName + "'")
+	base.RawQuery = params.Encode()
 
 	// Get the player information from api
-	resp, err := http.Get(url)
+	resp, err := http.Get(base.String())
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -120,11 +131,18 @@ func Stats(c echo.Context) (err error) {
 	playerId := playerResult.SearchPlayerAll.QueryResults.Row.PlayerID
 
 	// Format the URL with the season year and player id
-	url = fmt.Sprintf("http://lookup-service-prod.mlb.com/json/named.sport_hitting_tm.bam?league_list_id='mlb'&game_type='R'&season='%s'&player_id='%s'", season, playerId)
+	base, err = url.Parse("http://lookup-service-prod.mlb.com/json/named.sport_hitting_tm.bam")
 
-	fmt.Println(url)
+	// Query params
+	params = url.Values{}
+	params.Add("league_list_id", "'mlb'")
+	params.Add("game_type", "'R'")
+	params.Add("season", "'" + season + "'")
+	params.Add("player_id", "'" + playerId + "'")
+	base.RawQuery = params.Encode()
+
 	// Get the team the player played for in a specific year from api
-	resp, err = http.Get(url)
+	resp, err = http.Get(base.String())
 	if err != nil {
 		log.Fatalln(err)
 	}

@@ -13,9 +13,11 @@ func New() *echo.Echo {
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(middleware.CORS())
 
-	// Add favicon
+	// Add static files and assets
 	e.File("/favicon.ico", "assets/favicon.ico")
+	e.Static("/static", "static")
 
 	// Create route groups
 	lookupGroup := e.Group("/lookup")

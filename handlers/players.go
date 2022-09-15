@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"github.com/labstack/echo/v4"
+	"net/url"
 )
 
 type Player struct {
@@ -71,10 +72,20 @@ func Players(c echo.Context) (err error) {
 	}
 
 	// Format the URL with the player name provided
-	url := fmt.Sprintf("http://lookup-service-prod.mlb.com/json/named.search_player_all.bam?sport_code='mlb'&active_sw='Y'&name_part='%s%s'", playerName, "%25")
+	base, err := url.Parse("http://lookup-service-prod.mlb.com/json/named.search_player_all.bam")
+	if err != nil {
+		return
+	}
+
+	// Query params
+	params := url.Values{}
+	params.Add("sport_code", "'mlb'")
+	params.Add("active_sw", "'Y'")
+	params.Add("name_part", "'" + playerName + "'")
+	base.RawQuery = params.Encode()
 
 	// Get the player information from api
-	resp, err := http.Get(url)
+	resp, err := http.Get(base.String())
 	if err != nil {
 		log.Fatalln(err)
 	}

@@ -6,12 +6,12 @@ import (
 	"github.com/go-playground/validator"
 )
 
-func InitValidator(e *echo.Echo) {
-	e.Validator = &CustomValidator{validator: validator.New()}
-}
-
 type CustomValidator struct {
 	validator *validator.Validate
+}
+
+func InitValidator(e *echo.Echo) {
+	e.Validator = &CustomValidator{validator: validator.New()}
 }
 
 func (cv *CustomValidator) Validate(i interface{}) error {

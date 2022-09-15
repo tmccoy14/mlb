@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"github.com/labstack/echo/v4"
+	"net/url"
 )
 
 type Team struct {
@@ -20,7 +21,7 @@ type TeamResults struct {
 		QueryResults struct {
 			TotalSize string `json:"totalSize"`
 			Created   string `json:"created"`
-			Row       []struct {
+			Row       struct {
 				EndDate         string `json:"end_date"`
 				SportID         string `json:"sport_id"`
 				StatusDate      string `json:"status_date"`
@@ -70,8 +71,6 @@ func Teams(c echo.Context) (err error) {
 	season := c.QueryParam("season")
 	playerName := c.QueryParam("name")
 
-	fmt.Println(season, playerName)
-
 	// Validate required parameters
 	t := &Team{
 		Name: playerName,
@@ -85,10 +84,20 @@ func Teams(c echo.Context) (err error) {
 	}
 
 	// Format the URL with the player name provided
-	url := fmt.Sprintf("http://lookup-service-prod.mlb.com/json/named.search_player_all.bam?sport_code='mlb'&active_sw='Y'&name_part='%s%s'", playerName, "%25")
+	base, err := url.Parse("http://lookup-service-prod.mlb.com/json/named.search_player_all.bam")
+	if err != nil {
+		return
+	}
+
+	// Query params
+	params := url.Values{}
+	params.Add("sport_code", "'mlb'")
+	params.Add("active_sw", "'Y'")
+	params.Add("name_part", "'" + playerName + "'")
+	base.RawQuery = params.Encode()
 
 	// Get the player information from api
-	resp, err := http.Get(url)
+	resp, err := http.Get(base.String())
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -107,10 +116,16 @@ func Teams(c echo.Context) (err error) {
 	playerId := playerResult.SearchPlayerAll.QueryResults.Row.PlayerID
 
 	// Format the URL with the season year and player id
-	url = fmt.Sprintf("http://lookup-service-prod.mlb.com/json/named.player_teams.bam?season='%s'&player_id='%s'", season, playerId)
+	base, err = url.Parse("http://lookup-service-prod.mlb.com/json/named.player_teams.bam")
+
+	// Query params
+	params = url.Values{}
+	params.Add("season", "'" + season + "'")
+	params.Add("player_id", "'" + playerId + "'")
+	base.RawQuery = params.Encode()
 
 	// Get the team the player played for in a specific year from api
-	resp, err = http.Get(url)
+	resp, err = http.Get(base.String())
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -122,7 +137,7 @@ func Teams(c echo.Context) (err error) {
 	// Parse []byte to the go struct pointer
     var teamResult TeamResults
     if err := json.Unmarshal(body, &teamResult); err != nil {
-        fmt.Println("Can not unmarshal JSON")
+        fmt.Println("Can not unmarshal JSON111")
     }
 
 	// Return JSON formatted team information results
