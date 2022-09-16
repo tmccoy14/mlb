@@ -1,18 +1,19 @@
 package handlers
 
 import (
-	"net/http"
-	"log"
-	"fmt"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
-	"github.com/labstack/echo/v4"
+	"log"
+	"net/http"
 	"net/url"
+
+	"github.com/labstack/echo/v4"
 )
 
 type Stat struct {
-	Name    string `json:"name" validate:"required"`
-	Season  string `json:"season" validate:"required"`
+	Name   string `json:"name" validate:"required"`
+	Season string `json:"season" validate:"required"`
 }
 
 type StatResults struct {
@@ -88,7 +89,7 @@ func Stats(c echo.Context) (err error) {
 
 	// Validate required parameters
 	s := &Stat{
-		Name: playerName,
+		Name:   playerName,
 		Season: season,
 	}
 	if err = c.Bind(s); err != nil {
@@ -108,7 +109,7 @@ func Stats(c echo.Context) (err error) {
 	params := url.Values{}
 	params.Add("sport_code", "'mlb'")
 	params.Add("active_sw", "'Y'")
-	params.Add("name_part", "'" + playerName + "'")
+	params.Add("name_part", "'"+playerName+"'")
 	base.RawQuery = params.Encode()
 
 	// Get the player information from api
@@ -122,10 +123,10 @@ func Stats(c echo.Context) (err error) {
 	body, err := ioutil.ReadAll(resp.Body)
 
 	// Parse []byte to the go struct pointer
-    var playerResult PlayerResults
-    if err := json.Unmarshal(body, &playerResult); err != nil {
-        fmt.Println("Can not unmarshal JSON")
-    }
+	var playerResult PlayerResults
+	if err := json.Unmarshal(body, &playerResult); err != nil {
+		fmt.Println("Can not unmarshal JSON")
+	}
 
 	// Get the player id from player results
 	playerId := playerResult.SearchPlayerAll.QueryResults.Row.PlayerID
@@ -137,8 +138,8 @@ func Stats(c echo.Context) (err error) {
 	params = url.Values{}
 	params.Add("league_list_id", "'mlb'")
 	params.Add("game_type", "'R'")
-	params.Add("season", "'" + season + "'")
-	params.Add("player_id", "'" + playerId + "'")
+	params.Add("season", "'"+season+"'")
+	params.Add("player_id", "'"+playerId+"'")
 	base.RawQuery = params.Encode()
 
 	// Get the team the player played for in a specific year from api
@@ -152,10 +153,10 @@ func Stats(c echo.Context) (err error) {
 	body, err = ioutil.ReadAll(resp.Body)
 
 	// Parse []byte to the go struct pointer
-    var statResult StatResults
-    if err := json.Unmarshal(body, &statResult); err != nil {
-        fmt.Println("Can not unmarshal JSON")
-    }
+	var statResult StatResults
+	if err := json.Unmarshal(body, &statResult); err != nil {
+		fmt.Println("Can not unmarshal JSON")
+	}
 
 	// Return JSON formatted player statistics information results
 	return c.JSON(http.StatusOK, statResult)

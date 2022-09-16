@@ -1,18 +1,19 @@
 package handlers
 
 import (
-	"net/http"
-	"log"
-	"fmt"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
-	"github.com/labstack/echo/v4"
+	"log"
+	"net/http"
 	"net/url"
+
+	"github.com/labstack/echo/v4"
 )
 
 type Team struct {
-	Name    string `json:"name" validate:"required"`
-	Season  string `json:"season" validate:"required"`
+	Name   string `json:"name" validate:"required"`
+	Season string `json:"season" validate:"required"`
 }
 
 type TeamResults struct {
@@ -66,14 +67,14 @@ type TeamResults struct {
 }
 
 func Teams(c echo.Context) (err error) {
-	
+
 	// Get the player name from the parameters
 	season := c.QueryParam("season")
 	playerName := c.QueryParam("name")
 
 	// Validate required parameters
 	t := &Team{
-		Name: playerName,
+		Name:   playerName,
 		Season: season,
 	}
 	if err = c.Bind(t); err != nil {
@@ -93,7 +94,7 @@ func Teams(c echo.Context) (err error) {
 	params := url.Values{}
 	params.Add("sport_code", "'mlb'")
 	params.Add("active_sw", "'Y'")
-	params.Add("name_part", "'" + playerName + "'")
+	params.Add("name_part", "'"+playerName+"'")
 	base.RawQuery = params.Encode()
 
 	// Get the player information from api
@@ -107,10 +108,10 @@ func Teams(c echo.Context) (err error) {
 	body, err := ioutil.ReadAll(resp.Body)
 
 	// Parse []byte to the go struct pointer
-    var playerResult PlayerResults
-    if err := json.Unmarshal(body, &playerResult); err != nil {
-        fmt.Println("Can not unmarshal JSON")
-    }
+	var playerResult PlayerResults
+	if err := json.Unmarshal(body, &playerResult); err != nil {
+		fmt.Println("Can not unmarshal JSON")
+	}
 
 	// Get the player id from player results
 	playerId := playerResult.SearchPlayerAll.QueryResults.Row.PlayerID
@@ -120,8 +121,8 @@ func Teams(c echo.Context) (err error) {
 
 	// Query params
 	params = url.Values{}
-	params.Add("season", "'" + season + "'")
-	params.Add("player_id", "'" + playerId + "'")
+	params.Add("season", "'"+season+"'")
+	params.Add("player_id", "'"+playerId+"'")
 	base.RawQuery = params.Encode()
 
 	// Get the team the player played for in a specific year from api
@@ -135,10 +136,10 @@ func Teams(c echo.Context) (err error) {
 	body, err = ioutil.ReadAll(resp.Body)
 
 	// Parse []byte to the go struct pointer
-    var teamResult TeamResults
-    if err := json.Unmarshal(body, &teamResult); err != nil {
-        fmt.Println("Can not unmarshal JSON111")
-    }
+	var teamResult TeamResults
+	if err := json.Unmarshal(body, &teamResult); err != nil {
+		fmt.Println("Can not unmarshal JSON111")
+	}
 
 	// Return JSON formatted team information results
 	return c.JSON(http.StatusOK, teamResult)

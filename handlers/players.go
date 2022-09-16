@@ -1,17 +1,18 @@
 package handlers
 
 import (
-	"net/http"
-	"log"
-	"fmt"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
-	"github.com/labstack/echo/v4"
+	"log"
+	"net/http"
 	"net/url"
+
+	"github.com/labstack/echo/v4"
 )
 
 type Player struct {
-	Name  string `json:"name" validate:"required"`
+	Name string `json:"name" validate:"required"`
 }
 
 type PlayerResults struct {
@@ -56,7 +57,7 @@ type PlayerResults struct {
 }
 
 func Players(c echo.Context) (err error) {
-	
+
 	// Get the player name from the parameters
 	playerName := c.QueryParam("name")
 
@@ -81,7 +82,7 @@ func Players(c echo.Context) (err error) {
 	params := url.Values{}
 	params.Add("sport_code", "'mlb'")
 	params.Add("active_sw", "'Y'")
-	params.Add("name_part", "'" + playerName + "'")
+	params.Add("name_part", "'"+playerName+"'")
 	base.RawQuery = params.Encode()
 
 	// Get the player information from api
@@ -95,10 +96,10 @@ func Players(c echo.Context) (err error) {
 	body, err := ioutil.ReadAll(resp.Body)
 
 	// Parse []byte to the go struct pointer
-    var result PlayerResults
-    if err := json.Unmarshal(body, &result); err != nil {
-        fmt.Println("Can not unmarshal JSON")
-    }
+	var result PlayerResults
+	if err := json.Unmarshal(body, &result); err != nil {
+		fmt.Println("Can not unmarshal JSON")
+	}
 
 	// Return JSON formatted player information results
 	return c.JSON(http.StatusOK, result)

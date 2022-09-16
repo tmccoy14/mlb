@@ -1,15 +1,17 @@
 package api
 
 import (
-	handlers "github.com/tmccoy14/mlb/handlers"
 	"html/template"
 	"io"
+
 	"github.com/labstack/echo/v4"
+	"github.com/tmccoy14/mlb/handlers"
+	"github.com/tmccoy14/mlb/validator"
 )
 
 // Template data
 type Template struct {
-    templates *template.Template
+	templates *template.Template
 }
 
 // Render HTML template
@@ -32,7 +34,7 @@ func MainGroup(e *echo.Echo) {
 // Lookup route group to search players, teams, and stats
 func LookupGroup(g *echo.Group, e *echo.Echo) {
 
-	handlers.InitValidator(e)
+	validator.InitValidator(e)
 
 	g.GET("/players", handlers.Players)
 	g.GET("/teams", handlers.Teams)
