@@ -1,3 +1,4 @@
 # config.yaml
-SITE:
-  TITLE: Test Site
+PROJECT_ID: ""
+COLLECTION: ""
+PORT: ""

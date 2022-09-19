@@ -6,7 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/tmccoy14/mlb/handlers"
-	"github.com/tmccoy14/mlb/validator"
+	"github.com/tmccoy14/mlb/internal/validator"
 )
 
 // Template data
